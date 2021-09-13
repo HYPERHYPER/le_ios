@@ -45,12 +45,18 @@
 // TRUE when last written character was '\n'
 @property (nonatomic, assign) BOOL logentryCompleted;
 
+// Date from which buffer has been unable to write.
+// If this state persists, we should re-make the NSOutputStream.
+@property (nonatomic, strong) NSDate *noSpaceAvailableDate;
+
 @end
 
 @implementation LEBackgroundThread
 
 - (void)initNetworkCommunication
 {
+    self.noSpaceAvailableDate = nil;
+    
     CFWriteStreamRef writeStream;
     CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)LOGENTRIES_HOST, LOGENTRIES_PORT, NULL, &writeStream);
     
@@ -105,6 +111,7 @@
     
     if (eventCode & NSStreamEventErrorOccurred) {
         LE_DEBUG(@"Socket event NSStreamEventErrorOccurred, scheduling retry timer");
+        [[NSNotificationCenter defaultCenter] postNotificationName:kLENetworkErrorNotification object:nil];
         eventCode = (NSStreamEvent)(eventCode & ~NSStreamEventErrorOccurred);
         [self.outputSocketStream close];
         self.outputSocketStream = nil;
@@ -269,7 +276,23 @@
     
     if (![self.outputSocketStream hasSpaceAvailable]) {
         LE_DEBUG(@"No space available");
+        
+        if (self.noSpaceAvailableDate == nil) {
+            self.noSpaceAvailableDate = [NSDate date];
+        }
+        
+        // if for 2 minutes there's been no space while there was internet,
+        // fire off this error to recreate the NSOutputStream and reset the 1 minute counter
+        NSDate *now = [NSDate date];
+        if ([now timeIntervalSinceDate:self.noSpaceAvailableDate] > 120) {
+            [self stream:self.outputSocketStream handleEvent:NSStreamEventErrorOccurred];
+            self.noSpaceAvailableDate = nil;
+        }
+        
         return;
+    }
+    else {
+        self.noSpaceAvailableDate = nil;
     }
     
     NSUInteger maxLength = output_buffer_length - output_buffer_position;

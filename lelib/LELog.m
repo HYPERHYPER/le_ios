@@ -13,6 +13,7 @@
 #import "LogFiles.h"
 #import "lelib.h"
 
+NSString * const kLENetworkErrorNotification = @"kLENetworkErrorNotification";
 
 extern LEBackgroundThread* backgroundThread;
 
