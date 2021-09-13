@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+extern NSString * const kLENetworkErrorNotification;
+
 /* Obj-C API */
 
 @protocol LELoggableObject <NSObject>
