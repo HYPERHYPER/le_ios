@@ -17,7 +17,7 @@ LEBackgroundThread* backgroundThread;
 
 dispatch_queue_t le_write_queue;
 char* le_token;
-bool le_debug_logs = false;
+bool le_debug_logs = true;
 
 static int logfile_descriptor;
 static off_t logfile_size;
@@ -33,8 +33,14 @@ void LE_DEBUG(NSString *format, ...) {
         va_list args;
         va_start(args, format);
         NSLogv(format, args);
+        NSString *string = [[NSString alloc] initWithFormat:format arguments:args];
+//        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:kLEInfoNotification object:nil userInfo:@{ kLEInfoNotificationMessageKey : string }];
+//        });
+        
         va_end(args);
     }
+    
 #endif
 }
 
