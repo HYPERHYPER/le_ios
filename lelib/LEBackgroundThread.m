@@ -113,13 +113,7 @@
         LE_DEBUG(@"Socket event NSStreamEventErrorOccurred, scheduling retry timer");
         [[NSNotificationCenter defaultCenter] postNotificationName:kLENetworkErrorNotification object:nil];
         eventCode = (NSStreamEvent)(eventCode & ~NSStreamEventErrorOccurred);
-        [self.outputSocketStream close];
-        self.outputSocketStream = nil;
-        
-        self.networkStatus = [LeNetworkStatus new];
-        self.networkStatus.delegate = self;
-
-        self.retryTimer = [NSTimer scheduledTimerWithTimeInterval:RETRY_TIMEOUT target:self selector:@selector(retryTimerFired:) userInfo:nil repeats:NO];
+        [self reinitializeSocket];
     }
     
     if (eventCode & NSStreamEventHasSpaceAvailable) {
@@ -129,8 +123,24 @@
         
         [self check];
     }
+    
+    if (eventCode & NSStreamEventEndEncountered) {
+        LE_DEBUG(@"Socket event NSStreamEventEndEncountered, scheduling retry timer");
+        eventCode = (NSStreamEvent)(eventCode & ~NSStreamEventEndEncountered);
+        [self reinitializeSocket];
+    }
 
     if (eventCode) LE_DEBUG(@"Received event %x", (unsigned int)eventCode);
+}
+
+- (void)reinitializeSocket {
+    [self.outputSocketStream close];
+    self.outputSocketStream = nil;
+    
+    self.networkStatus = [LeNetworkStatus new];
+    self.networkStatus.delegate = self;
+
+    self.retryTimer = [NSTimer scheduledTimerWithTimeInterval:RETRY_TIMEOUT target:self selector:@selector(retryTimerFired:) userInfo:nil repeats:NO];
 }
 
 - (void)readNextData
