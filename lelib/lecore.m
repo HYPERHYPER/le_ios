@@ -17,7 +17,7 @@ LEBackgroundThread* backgroundThread;
 
 dispatch_queue_t le_write_queue;
 char* le_token;
-bool le_debug_logs = true;
+bool le_debug_logs = false;
 
 static int logfile_descriptor;
 static off_t logfile_size;
