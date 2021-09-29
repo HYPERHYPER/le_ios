@@ -126,6 +126,7 @@
     
     if (eventCode & NSStreamEventEndEncountered) {
         LE_DEBUG(@"Socket event NSStreamEventEndEncountered, scheduling retry timer");
+        [[NSNotificationCenter defaultCenter] postNotificationName:kLEStreamEndNotification object:nil];
         eventCode = (NSStreamEvent)(eventCode & ~NSStreamEventEndEncountered);
         [self reinitializeSocket];
     }

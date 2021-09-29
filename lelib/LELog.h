@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 extern NSString * const kLENetworkErrorNotification;
+extern NSString * const kLEStreamEndNotification;
 extern NSString * const kLEInfoNotification;
 extern NSString * const kLEInfoNotificationMessageKey;
 

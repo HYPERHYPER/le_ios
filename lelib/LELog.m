@@ -14,6 +14,7 @@
 #import "lelib.h"
 
 NSString * const kLENetworkErrorNotification = @"kLENetworkErrorNotification";
+NSString * const kLEStreamEndNotification = @"kLEStreamEndNotification";
 NSString * const kLEInfoNotification = @"kLEInfoNotification";
 NSString * const kLEInfoNotificationMessageKey = @"kLEInfoNotificationMessageKey";
 
