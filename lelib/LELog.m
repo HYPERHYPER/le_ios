@@ -14,6 +14,8 @@
 #import "lelib.h"
 
 NSString * const kLENetworkErrorNotification = @"kLENetworkErrorNotification";
+NSString * const kLEInfoNotification = @"kLEInfoNotification";
+NSString * const kLEInfoNotificationMessageKey = @"kLEInfoNotificationMessageKey";
 
 extern LEBackgroundThread* backgroundThread;
 
